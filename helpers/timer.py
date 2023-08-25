@@ -2,6 +2,8 @@ import pygame
 
 
 class Timer:  # cooldown function class - finally
+    """Timer class for cooldowns"""
+
     def __init__(self, duration, func=None):
         self.duration = duration
         self.func = func

@@ -90,6 +90,7 @@ class Player(pygame.sprite.Sprite):
                     tree.damage()
 
     def get_target_pos(self):
+        """get the position of the used tool"""
         self.target_pos = (
             self.rect.center + PLAYER_TOOL_OFFSET[self.status.split("_")[0]]
         )
@@ -101,6 +102,7 @@ class Player(pygame.sprite.Sprite):
             self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
 
     def import_assets(self):
+        """import all assets for the player"""
         self.animations = {}
 
         for animation in os.listdir("../graphics/character"):
@@ -108,6 +110,11 @@ class Player(pygame.sprite.Sprite):
             self.animations[animation] = import_folder(full_path)
 
     def animate(self, dt):
+        """animate the player
+
+        Args:
+            dt: delta time
+        """
         self.frame_index += 4 * dt
         if self.frame_index >= len(self.animations[self.status]):
             self.frame_index = 0
@@ -115,6 +122,11 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations[self.status][int(self.frame_index)]
 
     def movement(self, keys):
+        """move the player in the direction of the pressed key
+
+        Args:
+            keys: pressed keys
+        """
         if keys[pygame.K_UP]:
             self.direction.y = -1
             self.status = "up"
@@ -134,6 +146,11 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 0
 
     def actions(self, keys):
+        """make the player do some actions
+
+        Args:
+            keys: the pressed keys
+        """
         # tool actions
         if keys[pygame.K_SPACE]:
             self.timers["tool use"].activate()
@@ -174,6 +191,7 @@ class Player(pygame.sprite.Sprite):
                     self.sleep = True
 
     def input(self):
+        """parse the input of the player"""
         keys = pygame.key.get_pressed()
 
         if (
@@ -183,6 +201,7 @@ class Player(pygame.sprite.Sprite):
             self.actions(keys)
 
     def get_status(self):
+        """get the status of the player, can be idle or using a tool, important for displaying the right animation"""
         # idle
         if self.direction.magnitude() == 0:
             self.status = self.status.split("_")[0] + "_idle"
@@ -192,10 +211,16 @@ class Player(pygame.sprite.Sprite):
             self.status = self.status.split("_")[0] + "_" + self.selected_tool
 
     def update_timers(self):
+        """update all the various cooldowns (timers)"""
         for timer in self.timers.values():
             timer.update()
 
     def x_collision(self, sprite):
+        """determine collision in the x direction, and eliminate any weird teleporting around the sprite
+
+        Args:
+            sprite: sprite to check collision with
+        """
         if self.direction.x > 0:
             self.hitbox.right = sprite.hitbox.left
             self.rect.right = self.hitbox.right
@@ -206,6 +231,11 @@ class Player(pygame.sprite.Sprite):
         self.pos.x = self.hitbox.centerx
 
     def y_collision(self, sprite):
+        """determine collision in the y direction, and eliminate any weird teleporting around the sprite
+
+        Args:
+            sprite: sprite to check collision with
+        """
         if self.direction.y > 0:
             self.hitbox.bottom = sprite.hitbox.top
             self.rect.bottom = self.hitbox.bottom
@@ -216,6 +246,11 @@ class Player(pygame.sprite.Sprite):
         self.pos.y = self.hitbox.centery
 
     def collision(self, direction):
+        """detect collision with other sprites
+
+        Args:
+            direction: direction of the possible collision
+        """
         for sprite in self.collision_sprites.sprites():
             if hasattr(sprite, "hitbox"):
                 if self.hitbox.colliderect(sprite.hitbox):
@@ -225,18 +260,29 @@ class Player(pygame.sprite.Sprite):
                         self.y_collision(sprite)
 
     def move_x(self, dt):
+        """move the player in the x direction
+
+        Args:
+            dt: delta time
+        """
         self.pos.x += self.direction.x * self.speed * dt
         self.hitbox.centerx = round(self.pos.x)
         self.rect.centerx = self.hitbox.centerx
         self.collision("horizontal")
 
     def move_y(self, dt):
+        """move the player in the y direction
+
+        Args:
+            dt: delta time
+        """
         self.pos.y += self.direction.y * self.speed * dt
         self.hitbox.centery = round(self.pos.y)
         self.rect.centery = self.hitbox.centery
         self.collision("vertical")
 
     def move(self, dt):
+        """move the player in the direction of the pressed key"""
         # normalizing a vector
         if self.direction.magnitude() > 0:
             self.direction = self.direction.normalize()
@@ -245,6 +291,11 @@ class Player(pygame.sprite.Sprite):
         self.move_y(dt)
 
     def update(self, dt):
+        """update the player in time
+
+        Args:
+            dt: delta time
+        """
         self.input()
         self.get_status()
         self.update_timers()

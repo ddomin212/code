@@ -8,6 +8,8 @@ from objects.sprites import Generic
 
 
 class Sky:
+    """sky class for day and night cycle"""
+
     def __init__(self) -> None:
         self.display_surface = pygame.display.get_surface()
         self.full_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -15,6 +17,11 @@ class Sky:
         self.end_color = (38, 101, 189)
 
     def display(self, dt):
+        """handle the day and night cycle
+
+        Args:
+            dt: delta time
+        """
         for idx, value in enumerate(self.end_color):
             if self.start_color[idx] > value:
                 self.start_color[idx] -= 2 * dt
@@ -25,6 +32,12 @@ class Sky:
 
 
 class Drop(Generic):
+    """drop object for the rain effect
+
+    Args:
+        Generic: generic sprite class
+    """
+
     def __init__(self, surf, pos, moving, groups, z) -> None:
         super().__init__(pos, surf, groups, z)
         self.lifetime = randint(400, 500)
@@ -37,6 +50,11 @@ class Drop(Generic):
             self.speed = randint(200, 250)
 
     def update(self, dt):
+        """make the drop fall down
+
+        Args:
+            dt: delta time
+        """
         if self.moving:
             self.pos += self.direction * self.speed * dt
             self.rect.topleft = round(self.pos.x), round(self.pos.y)
@@ -45,6 +63,8 @@ class Drop(Generic):
 
 
 class Rain:
+    """rain class for rain effect"""
+
     def __init__(self, all_sprites) -> None:
         self.all_sprites = all_sprites
         self.rain_drops = import_folder("../graphics/rain/drops/")
@@ -54,6 +74,7 @@ class Rain:
         ).get_size()
 
     def create_floor(self):
+        """generate rain effects on the ground"""
         Drop(
             choice(self.rain_surfs),
             (randint(0, self.floor_w), randint(0, self.floor_h)),
@@ -63,6 +84,7 @@ class Rain:
         )
 
     def create_rain(self):
+        """generate rain drops in the sky"""
         Drop(
             choice(self.rain_drops),
             (randint(0, self.floor_w), randint(0, self.floor_h)),
@@ -72,5 +94,10 @@ class Rain:
         )
 
     def update(self, dt):
+        """update the rain effect
+
+        Args:
+            dt: delta time
+        """
         self.create_floor()
         self.create_rain()

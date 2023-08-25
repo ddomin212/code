@@ -9,6 +9,12 @@ from helpers.timer import Timer
 
 
 class Generic(pygame.sprite.Sprite):
+    """generic sprite class
+
+    Args:
+        pygame: pygame module
+    """
+
     def __init__(self, pos, surf, groups, z=LAYERS["main"]) -> None:
         super().__init__(groups)
         self.image = surf
@@ -20,6 +26,12 @@ class Generic(pygame.sprite.Sprite):
 
 
 class Water(Generic):
+    """water class for water effect
+
+    Args:
+        Generic: generic sprite class
+    """
+
     def __init__(self, pos, frames, groups) -> None:
         self.frames = frames
         self.frame_index = 0
@@ -32,6 +44,11 @@ class Water(Generic):
         )
 
     def animate(self, dt):
+        """animate the water
+
+        Args:
+            dt: delta time
+        """
         self.frame_index += 5 * dt
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
@@ -39,16 +56,33 @@ class Water(Generic):
         self.image = self.frames[int(self.frame_index)]
 
     def update(self, dt):
+        """update the water with time
+
+        Args:
+            dt: delta time
+        """
         self.animate(dt)
 
 
 class WildFlower(Generic):
+    """non-harvestable flower class
+
+    Args:
+        Generic: generic sprite class
+    """
+
     def __init__(self, pos, surf, groups) -> None:
         super().__init__(pos, surf, groups)
         self.hitbox = self.rect.copy().inflate(-20, -self.rect.height * 0.9)
 
 
 class Particle(Generic):
+    """particle effects for objects
+
+    Args:
+        Generic: generic sprite class
+    """
+
     def __init__(self, pos, surf, groups, z, duration=100) -> None:
         super().__init__(pos, surf, groups, z)
         self.start_time = pygame.time.get_ticks()
@@ -56,18 +90,30 @@ class Particle(Generic):
         self.flash()
 
     def flash(self):
+        """make the sprite white"""
         mask_surf = pygame.mask.from_surface(self.image)
         new_surf = mask_surf.to_surface()
         new_surf.set_colorkey((0, 0, 0))
         self.image = new_surf
 
     def update(self, dt):
+        """play the animation, where the white sprite fades away
+
+        Args:
+            dt: delta time
+        """
         current_time = pygame.time.get_ticks()
         if current_time - self.start_time >= self.duration:
             self.kill()
 
 
 class Tree(Generic):
+    """tree class for the tree object
+
+    Args:
+        Generic: generic sprite class
+    """
+
     def __init__(self, pos, surf, groups, name, player_add) -> None:
         super().__init__(pos, surf, groups)
 
@@ -83,6 +129,11 @@ class Tree(Generic):
         self.get_fruit(name)
 
     def get_fruit(self, name):
+        """get the fruit for the trees
+
+        Args:
+            name: name of the tree (small or large)
+        """
         self.apple = pygame.image.load(
             "../graphics/fruit/apple.png"
         ).convert_alpha()
@@ -91,6 +142,7 @@ class Tree(Generic):
         self.create_fruit()
 
     def damage(self):
+        """damage the tree"""
         self.health -= 1
 
         if len(self.apple_sprites.sprites()) > 0:
@@ -105,6 +157,7 @@ class Tree(Generic):
             choice(self.apple_sprites.sprites()).kill()
 
     def check_death(self):
+        """check if the tree has been cut down"""
         if self.health <= 0:
             Particle(
                 self.rect.topleft,
@@ -121,10 +174,16 @@ class Tree(Generic):
             self.alive = False
 
     def update(self, dt):
+        """update the tree with time
+
+        Args:
+            dt: delta time
+        """
         if self.alive:
             self.check_death()
 
     def create_fruit(self):
+        """create fruit on the tree"""
         for pos in self.apple_pos:
             if randint(0, 10) < 2:
                 apple_pos = (
@@ -140,6 +199,8 @@ class Tree(Generic):
 
 
 class Interaction(Generic):
+    """interaction class for the interaction object"""
+
     def __init__(self, pos, size, groups, name) -> None:
         surf = pygame.Surface(size)
         super().__init__(pos, surf, groups)

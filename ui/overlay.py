@@ -21,13 +21,14 @@ class Overlay:
             ).convert_alpha()
             for seed in player.seeds
         }
-        # print(self.seeds_surface, self.tools_surface)
+
+    def display_box(self, flag):
+        """display the selected item for seeds or tools"""
+        surf = eval(f"self.{flag}s_surface[self.player.selected_{flag}]")
+        rect = surf.get_rect(midbottom=OVERLAY_POSITIONS[flag])
+        self.display_surface.blit(surf, rect)
 
     def display(self):
-        tool_surf = self.tools_surface[self.player.selected_tool]
-        tool_rect = tool_surf.get_rect(midbottom=OVERLAY_POSITIONS["tool"])
-        self.display_surface.blit(tool_surf, tool_rect)
-
-        seed_surf = self.seeds_surface[self.player.selected_seed]
-        seed_rect = seed_surf.get_rect(midbottom=OVERLAY_POSITIONS["seed"])
-        self.display_surface.blit(seed_surf, seed_rect)
+        """display the overlay"""
+        self.display_box("tool")
+        self.display_box("seed")

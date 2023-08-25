@@ -4,6 +4,8 @@ from helpers.settings import *
 
 
 class Transition:
+    """class for the transition when player goes to sleep"""
+
     def __init__(self, reset, player) -> None:
         self.display_surface = pygame.display.get_surface()
         self.reset = reset
@@ -14,6 +16,11 @@ class Transition:
         self.speed = -2
 
     def play(self, dt):
+        """play the transition
+
+        Args:
+            dt: delta time
+        """
         self.color += self.speed
 
         if self.color <= 0:
